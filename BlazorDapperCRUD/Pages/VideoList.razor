@@ -1,0 +1,68 @@
+﻿@using BlazorDapperCRUD.Data
+@page "/videolist"
+@inject IVideoService VideoService
+
+<h3>Video List</h3>
+<p style="text-align:center">
+    <!-- Calling videoaddedit with id of zero configures page for Insert -->
+    <a href="/videoaddedit/0">Add a Video</a>
+</p>
+@if (videos == null)
+{
+    <p style="text-align:center">
+        <img src="../images/loader.gif" />
+    </p>
+}
+else
+{
+    <table>
+        <tr>
+            <th>Edit</th>
+            <th>Video Title</th>
+            <th>Date Published</th>
+            <th>Is Active</th>
+            <th>Delete</th>
+        </tr>
+        @foreach (var video in videos)
+        {
+    <tr>
+        <td>
+            <!-- Calling videoaddedit with id configures page for Update of that table row -->
+            <a href="videoaddedit/@video.VideoID">
+                <img src="../images/iEdit.png" />
+            </a>
+        </td>
+        <td>@video.Title</td>
+        <td>@video.DatePublished.ToShortDateString()</td>
+        <td>
+            @*Show a green check for active videos...*@
+            @if (video.IsActive)
+            {
+                <img src="../images/iGreenCheck.png" />
+            }
+            @* ...a red X otherwise *@
+            else
+            {
+                <img src="../images/iRedX.png" />
+            }
+        </td>
+        @* Trashcan icon, only if you want to offer physical deletes *@
+        <td>
+            <a href="videodelete/@video.VideoID">
+                <img src="../images/iTrash.png" alt="Delete" title="Delete" />
+            </a>
+        </td>
+    </tr>
+        }
+    </table>
+}
+
+@code {
+    // Create and empty list, named viideos, of empty Video objects.
+    IEnumerable<Video> videos;
+    protected override async Task OnInitializedAsync()
+    {
+        //Populate the list of video objects from the Video table.
+        videos = await VideoService.VideoList();
+    }
+}
